@@ -25,8 +25,17 @@ const data = [
 ];
 
 app.get("/api/persons", (request, response) => {
-  return response.status(200).send(data);
+  return response.send(data);
 });
+
+app.get("/info", (request, response) => {
+  console.log(request)
+  console.log(request.data)
+  const strResponse = `Phonebook has info for ${data.length} people
+  <br/>
+  ${Date().toLocaleString()}`
+  return response.send(strResponse)
+})
 
 const PORT = 3001;
 app.listen(PORT, () => {
