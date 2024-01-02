@@ -25,17 +25,23 @@ const data = [
 ];
 
 app.get("/api/persons", (request, response) => {
-  return response.send(data);
+  return response.json(data);
+});
+
+app.get("/api/persons/:id", (request, response) => {
+  const id = request.params.id;
+  let requestedPerson = data.find((p) => p.id === Number(id));
+  return requestedPerson
+    ? response.json(requestedPerson)
+    : response.status(404).end();
 });
 
 app.get("/info", (request, response) => {
-  console.log(request)
-  console.log(request.data)
   const strResponse = `Phonebook has info for ${data.length} people
   <br/>
-  ${Date().toLocaleString()}`
-  return response.send(strResponse)
-})
+  ${Date().toLocaleString()}`;
+  return response.send(strResponse);
+});
 
 const PORT = 3001;
 app.listen(PORT, () => {
