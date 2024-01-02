@@ -1,7 +1,9 @@
 const express = require("express");
 const app = express();
 
-const data = [
+app.use(express.json());
+
+let data = [
   {
     id: 1,
     name: "Arto Hellas",
@@ -26,6 +28,37 @@ const data = [
 
 app.get("/api/persons", (request, response) => {
   return response.json(data);
+});
+
+let checkErrors = (newPerson) => {
+  let errors = []
+  if (!newPerson.name) {
+    errors.push("Name is missing");
+  }
+  if (!newPerson.number) {
+    errors.push("Number is missing");
+  }
+  if (data.map((x) => x.name).includes(newPerson.name)) {
+    errors.push("The name already exists");
+  }
+  return errors
+}
+
+app.post("/api/persons", (request, response) => {
+  const newPerson = { ...request.body, id: Math.floor(Math.random() * 100000) };
+
+  let errors = checkErrors(newPerson);
+  if (errors.length !== 0)
+    return response.status(400).json({ error: errors.length === 1 ? errors[0] : errors});
+
+  data.push(newPerson)
+  return response.json({ newPerson });
+});
+
+app.delete("/api/persons/:id", (request, response) => {
+  const id = Number(request.params.id);
+  data = data.filter((elem) => elem.id !== id);
+  return response.status(204).end();
 });
 
 app.get("/api/persons/:id", (request, response) => {
