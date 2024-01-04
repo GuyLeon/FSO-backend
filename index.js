@@ -1,7 +1,17 @@
 const express = require("express");
+const morgan = require("morgan");
 const app = express();
 
 app.use(express.json());
+
+// Create a token used to log request body - assuming it's json)
+morgan.token("data", function (req, res) {
+  return JSON.stringify(req.body);
+});
+// Use this token to add the request body at the end of the log
+app.use(
+  morgan(":method :url :status :res[content-length] - :response-time ms :data")
+);
 
 let data = [
   {
@@ -31,9 +41,9 @@ app.get("/api/persons", (request, response) => {
 });
 
 let checkErrors = (newPerson) => {
-  let errors = []
+  let errors = [];
   if (!newPerson.name) {
-    errors.push("Name is missing");
+    errors.push(" Name is missing");
   }
   if (!newPerson.number) {
     errors.push("Number is missing");
@@ -41,17 +51,19 @@ let checkErrors = (newPerson) => {
   if (data.map((x) => x.name).includes(newPerson.name)) {
     errors.push("The name already exists");
   }
-  return errors
-}
+  return errors;
+};
 
 app.post("/api/persons", (request, response) => {
   const newPerson = { ...request.body, id: Math.floor(Math.random() * 100000) };
 
   let errors = checkErrors(newPerson);
   if (errors.length !== 0)
-    return response.status(400).json({ error: errors.length === 1 ? errors[0] : errors});
+    return response
+      .status(400)
+      .json({ error: errors.length === 1 ? errors[0] : errors });
 
-  data.push(newPerson)
+  data.push(newPerson);
   return response.json({ newPerson });
 });
 
