@@ -1,8 +1,11 @@
 const express = require("express");
 const morgan = require("morgan");
+const cors = require("cors");
 const app = express();
 
 app.use(express.json());
+
+app.use(cors())
 
 // Create a token used to log request body - assuming it's json)
 morgan.token("data", function (req, res) {
@@ -64,7 +67,7 @@ app.post("/api/persons", (request, response) => {
       .json({ error: errors.length === 1 ? errors[0] : errors });
 
   data.push(newPerson);
-  return response.json({ newPerson });
+  return response.json(newPerson);
 });
 
 app.delete("/api/persons/:id", (request, response) => {
